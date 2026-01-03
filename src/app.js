@@ -1,5 +1,6 @@
 const express = require('express')
 const cors = require('cors')
+const bcrypt = require('bcrypt')
 
 // Cria a aplicação Express
 const app = express()
@@ -19,8 +20,8 @@ app.get('/health', (req, res) => {
   })
 })
 
-// Define uma rota POST para /users
-app.post('/users', (req, res) => {
+// Define uma rota POST para criar usuários
+app.post('/users', async (req, res) => {
 
   // Extrai name, email e password do corpo da requisição (req.body)
   const { name, email, password } = req.body
@@ -33,6 +34,10 @@ app.post('/users', (req, res) => {
         error: 'Name, email and password are required'
       })
     }
+
+    // Gera um hash da senha utilizando bcrypt
+    // 10 é o número de "salt rounds" (complexidade do hash)
+    const HashedPassword = await bcrypt.hash(password, 10)
 
   // Se passar da validação retorna status 201 (Created) e um JSON como resposta
   return res.status(201).json({
