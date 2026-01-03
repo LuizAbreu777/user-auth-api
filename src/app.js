@@ -3,7 +3,7 @@ const cors = require('cors')
 const bcrypt = require('bcrypt')
 
 // Array que simula um banco de dados em memória
-// Os dados ficam aqui enquanto o servidor estiver rodando ou, seja, quando o servidor reiniciar → array zera
+// Os dados ficam aqui enquanto o servidor estiver rodando, ou seja, quando o servidor reiniciar → array zera
 const users = []
 
 // Cria a aplicação Express
@@ -63,6 +63,52 @@ app.post('/users', async (req, res) => {
     user: {
       name,
       email
+    }
+  })
+})
+
+app.post('/login', async (req, res) => {
+
+  // extrai email e senha do corpo da requisição
+  const {email, password} = req.body
+
+  // Valida se email e senha foram enviados
+  if (!email || !password) {
+    return res.status(400).json ({
+      message: 'email and password are required'
+    })
+  }
+
+  // Busca no "banco" um usuário com email indformado
+  const user = users.find(user => user.email === email)
+
+  // Se usuário não for encontrado, retorna erro
+
+  if (!user){
+
+    return res.status(401).json ({
+      message: 'Invalid credentials'
+    })
+  }
+  
+  // Compara a senha informada com o hash armazenado
+
+  const passwordMatch = await bcrypt.compare(password, user.password) 
+
+  if (!passwordMatch)  {
+    return res.status(401).json({
+      message: "Invalid credentials"
+    })
+  }
+
+  // Login Bem-sucessido
+  
+  return res.status(200).json ({
+    message: "Login successful",
+    user:{
+    id: user.id,
+    name: user.name,
+    email: user.email
     }
   })
 })
