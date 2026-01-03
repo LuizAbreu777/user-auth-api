@@ -25,7 +25,16 @@ app.post('/users', (req, res) => {
   // Extrai name, email e password do corpo da requisição (req.body)
   const { name, email, password } = req.body
 
-  // Retorna status 201 (Created) e um JSON como resposta
+  // Valida se name, email e password foram fornecidos
+  // O operador ! (negação) verifica se o valor é "falsy" (nulo, indefinido, vazio, etc.)
+    if (!name || !email || !password) {
+
+      return res.status(400).json ({
+        error: 'Name, email and password are required'
+      })
+    }
+
+  // Se passar da validação retorna status 201 (Created) e um JSON como resposta
   return res.status(201).json({
 
     // Mensagem de sucesso
