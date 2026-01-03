@@ -2,6 +2,10 @@ const express = require('express')
 const cors = require('cors')
 const bcrypt = require('bcrypt')
 
+// Array que simula um banco de dados em memória
+// Os dados ficam aqui enquanto o servidor estiver rodando ou, seja, quando o servidor reiniciar → array zera
+const users = []
+
 // Cria a aplicação Express
 const app = express()
 
@@ -37,7 +41,16 @@ app.post('/users', async (req, res) => {
 
     // Gera um hash da senha utilizando bcrypt
     // 10 é o número de "salt rounds" (complexidade do hash)
-    const HashedPassword = await bcrypt.hash(password, 10)
+    const hashedPassword = await bcrypt.hash(password, 10)
+
+    const newUser = {
+      id: users.length + 1, 
+      name,
+      email,
+      password: hashedPassword
+    }
+
+    users.push (newUser)
 
   // Se passar da validação retorna status 201 (Created) e um JSON como resposta
   return res.status(201).json({
